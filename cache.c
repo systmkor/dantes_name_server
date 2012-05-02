@@ -12,8 +12,10 @@ void add_record(hash_key cache_key, rr_t rr) {
   record_t *curr_record;
   record_t *new_record;
 
-  if (cache_entry == NULL)
+  if (cache_entry == NULL) {
     add_entry(cache_key);
+    cache_entry = find_entry(cache_key);
+  }
  
   if (cache_entry->record == NULL)
     cache_entry->record = record_alloc();
