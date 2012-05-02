@@ -1,0 +1,4 @@
+*.so
+*.o
+dns_server
+*~
