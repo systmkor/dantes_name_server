@@ -43,8 +43,8 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
       printf("Received Responce\n");
       break;
       
-    case S_CHECK_CACHE:
-      check_cache(Dstate);
+    case S_CACHE_CHECK:
+      cache_check(Dstate);
       break;
       
     case S_STORE_IN_CACHE:
@@ -71,11 +71,14 @@ void recv_query(dns_state *Dstate) {
   parse_dns_hdr(Dstate);
   parse_question(Dstate);
   print_name(Dstate->external_q.name);
-  Dstate->state = S_LISTEN;
+  Dstate->state = S_CACHE_CHECK;
+  //  Dstate->state = S_LISTEN;
 }
 
-void check_cache(dns_state *Dstate) {
-  
+void cache_check(dns_state *Dstate) {
+
+
+  printf("Cache Check\n");
 }
 
 void print_name(name_t *name) {
@@ -139,6 +142,8 @@ void init_dns_state(dns_state **Dstate, conn *Conn, pkt *Pkt) {
   (*Dstate)->conn = *Conn;
   (*Dstate)->recvpkt = *Pkt;
   (*Dstate)->state = query_or_resp(*Dstate);
+  (*Dstate)->external_q.name = NULL;
+  (*Dstate)->internal_q.name = NULL;
 }
 
 m_state query_or_resp(dns_state *Dstate) {
@@ -170,8 +175,8 @@ int copy_name(pkt *Pkt, uint8_t *buff, name_t **name) {
   if (Pkt == NULL || buff == NULL)
     return 0;
 
-  if ((*name) == NULL)
-    (*name) = name_alloc();
+  if (*name == NULL)
+    *name = name_alloc();
 
   name_temp = *name;
 

@@ -69,7 +69,7 @@ enum M_STATE {
   S_RECV_QUERY, S_RECV_RESP, S_SEND_QUERY, S_SEND_RESP,
   S_HDR_QUEST, S_HDR_ANSW, S_HDR_AUTH, S_HDR_ADDI,
   S_STORE_IN_CACHE,
-  S_CHECK_CACHE,
+  S_CACHE_CHECK,
   S_EXTERN_QUEST, S_EXTERN_ANSW,
   S_INTERN_QUEST, S_INTERN_ANSW
 };
@@ -203,5 +203,5 @@ void print_name(name_t *name);
 void recv_query(dns_state *Dstate);
 int copy_name(pkt *Pkt, uint8_t *buff, name_t **name);
 int copy_label(name_meta_t *name_meta, name_t **name, uint8_t *src, uint8_t *src_end);
-void check_cache(dns_state *Dstate);
+void cache_check(dns_state *Dstate);
 #endif
