@@ -92,13 +92,26 @@ void print_name(name_t *name) {
   printf("\n");
 }
 
+void name_to_str(name_t *name, char *namestr) {
+  int num_chars = 0;
+  if (name == NULL)
+    return;
+
+  do {
+    num_chars = snprintf(namestr, DNS_LABEL_MAX_LEN, "%s.",  name->label);
+    namestr += num_chars; //!!CHECK TO MAK SURE NOT GOING BEYOND BOUNDARIES
+    name = name->next_label;
+  }while(name != NULL);
+  namestr[num_chars] = '\0';
+}
+
 void parse_question(dns_state *Dstate) {
   uint8_t *buff;
   uint32_t i;
   printf("parsing question\n");
   buff = Dstate->recvpkt.datagram + DNS_HDR_SIZE;
   copy_name(&(Dstate->recvpkt), buff, &(Dstate->external_q.name));
-
+  name_to_str(Dstate->external_q.name, Dstate->external_q.namestr);
   buff = Dstate->recvpkt.datagram + DNS_HDR_SIZE;
   for (i = 0; i < DNS_NAME_MAX_LEN; i++)
     if (buff[i] == '\0' || DNS_LABEL_PTR(buff[i]))
@@ -144,6 +157,8 @@ void init_dns_state(dns_state **Dstate, conn *Conn, pkt *Pkt) {
   (*Dstate)->state = query_or_resp(*Dstate);
   (*Dstate)->external_q.name = NULL;
   (*Dstate)->internal_q.name = NULL;
+  bzero((*Dstate)->external_q.namestr, DNS_NAME_MAX_LEN);
+  bzero((*Dstate)->internal_q.namestr, DNS_NAME_MAX_LEN);
 }
 
 m_state query_or_resp(dns_state *Dstate) {

@@ -98,6 +98,7 @@ struct dns_q_s {
   bool type_answered;
   //  q_rdata question;
   name_t *name;
+  char namestr[DNS_NAME_MAX_LEN];
   uint16_t qtype;
   uint16_t qclass;
 };
@@ -200,6 +201,7 @@ int handle_pointing(pkt *Pkt, uint8_t *buff);
 void parse_dns_hdr(dns_state *Dstate);
 void parse_question(dns_state *Dstate);
 void print_name(name_t *name);
+void name_to_str(name_t *name, char *namestr);
 void recv_query(dns_state *Dstate);
 int copy_name(pkt *Pkt, uint8_t *buff, name_t **name);
 int copy_label(name_meta_t *name_meta, name_t **name, uint8_t *src, uint8_t *src_end);
