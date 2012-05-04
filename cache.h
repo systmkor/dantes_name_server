@@ -17,8 +17,7 @@ struct record_s {
   rr_t rr;
   time_t time_created;
   struct record_s *next;
-  struct record_s *prev;
-  
+  struct record_s *prev;  
 };
 typedef struct record_s record_t;
 

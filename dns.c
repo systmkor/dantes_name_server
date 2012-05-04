@@ -47,7 +47,11 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
       cache_check(Dstate);
       break;
 
-    case S_QUESTIONS_CHECK:
+    case S_RESOLVE:
+  //create pointer at beginning of q_name_str
+  //create pointer at end of q_name_str (put on the null char)
+  //end_ptr +1 then keep scanning until ptr+1 =  to the the next
+  //lo.edu.
       break;
       
     case S_STORE_IN_CACHE:
@@ -57,6 +61,9 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
       break;
       
     case S_SEND_RESP:
+      break;
+
+    case S_CREATE_ANSWER:
       break;
       
     case S_EXIT:
@@ -79,14 +86,16 @@ void recv_query(dns_state *Dstate) {
 }
 
 void cache_check(dns_state *Dstate) {
+  ht_entry *entry = find_entry(Dstate->question_key);
 
-  //create pointer at beginning of q_name_str
-  //create pointer at end of q_name_str (put on the null char)
-  //end_ptr +1 then keep scanning until ptr+1 =  to the the next
-  //lo.edu.
-  printf("Cache Check\n");
-  printf("Recurse %u\n", Dstate->rd);
-  Dstate->state = S_LISTEN;
+  if (entry == NULL) {
+    if (Dstate->rd == RECURSE_YES)
+      Dstate->state = S_QUESTIONS_CHECK;
+  
+    Dstate->state = S_CREATE_ANSWER;
+  }
+
+  Dstate->state = S_RESOLVE;
 }
 
 void print_name(name_t *name) {
@@ -102,8 +111,15 @@ void print_name(name_t *name) {
 
 void name_to_str(name_t *name, char *namestr) {
   int num_chars = 0;
-  if (name == NULL)
+
+  if (name == NULL && namestr == NULL)
     return;
+
+  if (name == NULL && namestr != NULL) {
+    namestr[0] = '.';
+    namestr[1] = '\0';
+    return;
+  }
 
   do {
     num_chars = snprintf(namestr, DNS_LABEL_MAX_LEN, "%s.",  name->label);

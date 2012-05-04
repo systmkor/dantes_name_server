@@ -70,7 +70,8 @@ enum M_STATE {
   S_HDR_QUEST, S_HDR_ANSW, S_HDR_AUTH, S_HDR_ADDI,
   S_STORE_IN_CACHE,
   S_CACHE_CHECK,
-  S_QUESTIONS_CHECK,
+  S_RESOLVE,
+  S_CREATE_RESP, S_CREATE_QUERY,
   S_EXTERN_QUEST, S_EXTERN_ANSW,
   S_INTERN_QUEST, S_INTERN_ANSW
 };
@@ -101,6 +102,7 @@ struct dns_q_s {
   name_t *name_pos; //where in the name you are currently are at to check cache
   //  q_rdata question;
   name_t *name;
+  hash_key key;
   char namestr[DNS_NAME_MAX_LEN];
   uint16_t qtype;
   uint16_t qclass;
@@ -112,9 +114,13 @@ struct dns_state_s {
   conn conn;
   pkt recvpkt;
   pkt sendpkt;
-
+  // turn internal_q etc into a linked list of qs and only add to the list when a quesiton is
+  // answered
+  hash_key question_key;
+  ht_entry *cache_ret;
   dns_q internal_q;
   dns_q external_q;
+  dns_q *q;
 
   dns_id id; //identification value
   bool rd; //recurse or not
