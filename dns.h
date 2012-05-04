@@ -22,7 +22,7 @@
 #define DNS_HDR_ID_OFFSET (0)
 
 #define DNS_HDR_ID(addr) (*(uint16_t *)addr)
-#define DNS_HDR_QR(byte) ((DNS_HDR_QR_MASK & (uint8_t)byte))
+#define DNS_HDR_QR(byte) ((DNS_HDR_QR_MASK & (uint8_t)byte) >> 7) //potential issues
 #define DNS_HDR_OPCODE(byte) ((DNS_HDR_OPCODE_MASK & (uint8_t)byte) >> 3)
 #define DNS_HDR_AA(byte) ((DNS_HDR_AA_MASK & (uint8_t)byte))
 #define DNS_HDR_TC(byte) ((DNS_HDR_TC_MASK & (uint8_t)byte))
@@ -116,11 +116,11 @@ struct dns_state_s {
   dns_q internal_q;
   dns_q external_q;
 
-  dns_id id;
-  bool rd;
-  bool aa;
-  bool tc;
-  bool qr;
+  dns_id id; //identification value
+  bool rd; //recurse or not
+  bool aa; //authorative answer
+  bool tc; //truncate
+  bool qr; //question or response
   uint16_t qdcount;
   uint16_t ancount;
   uint16_t nscount;

@@ -74,7 +74,7 @@ void recv_query(dns_state *Dstate) {
   parse_dns_hdr(Dstate);
   parse_question(Dstate);
   print_name(Dstate->external_q.name);
-  Dstate->state = S_QUESTIONS_CHECK;
+  Dstate->state = S_CACHE_CHECK;//_QUESTIONS_CHECK;
   //  Dstate->state = S_LISTEN;
 }
 
@@ -84,8 +84,8 @@ void cache_check(dns_state *Dstate) {
   //create pointer at end of q_name_str (put on the null char)
   //end_ptr +1 then keep scanning until ptr+1 =  to the the next
   //lo.edu.
-
   printf("Cache Check\n");
+  printf("Recurse %u\n", Dstate->rd);
   Dstate->state = S_LISTEN;
 }
 
@@ -119,6 +119,7 @@ void parse_question(dns_state *Dstate) {
   printf("parsing question\n");
   buff = Dstate->recvpkt.datagram + DNS_HDR_SIZE;
   copy_name(&(Dstate->recvpkt), buff, &(Dstate->external_q.name));
+  Dstate->external_q.name_pos = end_of_name(Dstate->external_q.name);
   name_to_str(Dstate->external_q.name, Dstate->external_q.namestr);
   buff = Dstate->recvpkt.datagram + DNS_HDR_SIZE;
   for (i = 0; i < DNS_NAME_MAX_LEN; i++)
@@ -129,6 +130,14 @@ void parse_question(dns_state *Dstate) {
   buff += 1;
   Dstate->external_q.qclass = buff[i];  //get qclass
   printf("qtype: %u  :: qclass: %u\n", Dstate->external_q.qtype, Dstate->external_q.qclass);
+}
+
+name_t *end_of_name(name_t *name) {
+  name_t *temp = name;
+  while (temp->next_label != NULL)
+    temp = temp->next_label;
+
+  return temp;
 }
 
 void parse_dns_hdr(dns_state *Dstate) {
