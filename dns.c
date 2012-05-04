@@ -46,6 +46,9 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
     case S_CACHE_CHECK:
       cache_check(Dstate);
       break;
+
+    case S_QUESTIONS_CHECK:
+      break;
       
     case S_STORE_IN_CACHE:
       break;
@@ -71,14 +74,19 @@ void recv_query(dns_state *Dstate) {
   parse_dns_hdr(Dstate);
   parse_question(Dstate);
   print_name(Dstate->external_q.name);
-  Dstate->state = S_CACHE_CHECK;
+  Dstate->state = S_QUESTIONS_CHECK;
   //  Dstate->state = S_LISTEN;
 }
 
 void cache_check(dns_state *Dstate) {
 
+  //create pointer at beginning of q_name_str
+  //create pointer at end of q_name_str (put on the null char)
+  //end_ptr +1 then keep scanning until ptr+1 =  to the the next
+  //lo.edu.
 
   printf("Cache Check\n");
+  Dstate->state = S_LISTEN;
 }
 
 void print_name(name_t *name) {

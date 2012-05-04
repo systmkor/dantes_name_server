@@ -70,6 +70,7 @@ enum M_STATE {
   S_HDR_QUEST, S_HDR_ANSW, S_HDR_AUTH, S_HDR_ADDI,
   S_STORE_IN_CACHE,
   S_CACHE_CHECK,
+  S_QUESTIONS_CHECK,
   S_EXTERN_QUEST, S_EXTERN_ANSW,
   S_INTERN_QUEST, S_INTERN_ANSW
 };
@@ -94,8 +95,10 @@ struct q_rdata_s {
 typedef struct q_rdata_s q_rdata;
 
 struct dns_q_s {
+  bool question_asked;
   bool name_answered;
   bool type_answered;
+  name_t *name_pos; //where in the name you are currently are at to check cache
   //  q_rdata question;
   name_t *name;
   char namestr[DNS_NAME_MAX_LEN];
