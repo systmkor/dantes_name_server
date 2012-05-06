@@ -2,6 +2,7 @@
 #define DNS_H_
 
 #include <stdint.h>
+#include "extypes.h"
 #include "dns_types.h"
 #include "cache.h"
 #include "conn.h"
@@ -73,7 +74,7 @@ enum M_STATE {
 };
 typedef enum M_STATE m_state;
 
-typedef uint8_t bool;
+
 typedef uint16_t dns_id;
 
 struct name_s {
@@ -179,4 +180,5 @@ void cache_check(dns_state *Dstate);
 void store_in_cache(dns_state *Dstate);
 void resolve(dns_state *Dstate);
 name_t *end_of_name(name_t *name);
+bool rr_cmp(rr_t a, rr_t b);
 #endif

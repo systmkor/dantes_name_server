@@ -2,9 +2,13 @@
 #ifndef CACHE_H_
 #define CACHE_H_
 
+#include "extypes.h"
 #include "dns_types.h"
 //#include "dns.h"
 #include "uthash.h"
+
+#define RECORD_EXISTS (1)
+#define RECORD_DNE (0)
 
 struct hash_key_s {
   uint8_t name[DNS_NAME_MAX_LEN];  

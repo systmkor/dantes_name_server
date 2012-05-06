@@ -50,8 +50,8 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
       cache_check(Dstate);
       break;
 
-    case S_QUESTIONS_CHECK:
-      break;
+      //    case S_QUESTIONS_CHECK:
+      //      break;
 
     case S_RESOLVE:
       break;
@@ -116,7 +116,7 @@ void cache_check(dns_state *Dstate) {
 
   if (entry == NULL) {
     if (Dstate->rd == RECURSE_YES)
-      Dstate->state = S_QUESTIONS_CHECK;
+      Dstate->state = S_RESOLVE;//S_QUESTIONS_CHECK;
   
     Dstate->state = S_CREATE_RESP;
   }
@@ -336,3 +336,18 @@ int handle_pointing(pkt *Pkt, uint8_t *buff) {
 }
 
 
+bool rr_cmp(rr_t a, rr_t b) {
+  if (a.type != b.type)
+    return 0;
+ 
+  if (a.class != b.class)
+    return 0;
+
+  if (strncmp((char *)a.name, (char *)b.name, DNS_NAME_MAX_LEN))
+    return 0;
+
+  if (memcmp(a.rdata, b.rdata, a.rdlength <= b.rdlength ? a.rdlength: b.rdlength))
+    return 0;
+
+  return 1;
+}

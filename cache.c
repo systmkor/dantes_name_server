@@ -1,5 +1,6 @@
 #include <time.h>
 #include <limits.h>
+#include "extypes.h"
 #include "smartalloc.h"
 #include "cache.h"
 #include "dns.h"
@@ -12,6 +13,7 @@ void add_record(hash_key cache_key, rr_t rr) {
   ht_entry *cache_entry;
   record_t *curr_record;
   record_t *new_record;
+  bool record_exists = RECORD_DNE;
   
   cache_entry = find_entry(cache_key);
 
@@ -24,15 +26,22 @@ void add_record(hash_key cache_key, rr_t rr) {
     cache_entry->record = record_alloc();
 
   curr_record = cache_entry->record;
-  while (curr_record->next != NULL) {
-    curr_record = curr_record->next;
-  }
+  
+  do {
+    if (rr_cmp(curr_record->rr, rr))
+      record_exists = RECORD_EXISTS;
 
-  new_record = record_alloc();
-  curr_record->next = new_record;
-  new_record->prev = curr_record;
-  new_record->rr = rr;
-  time(&(new_record->time_created));
+    else 
+      curr_record = curr_record->next;
+  }while (curr_record->next != NULL && record_exists == RECORD_DNE);
+
+  if (!record_exists) {
+    new_record = record_alloc();
+    curr_record->next = new_record;
+    new_record->prev = curr_record;
+    new_record->rr = rr;
+    time(&(new_record->time_created));
+  }
 }
 
 record_t *record_alloc(void) {
