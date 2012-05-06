@@ -2,3 +2,4 @@
 *.o
 dns_server
 *~
+*.gch

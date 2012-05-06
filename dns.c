@@ -6,6 +6,9 @@
 #include "dns.h"
 #include "cache.h"
 
+
+//!!! When storing dns entries sanitize the input by making all chars lower case!!!//
+
 ht_entry *cache = NULL;
 
 void process_pkts(conn *Conn) {
@@ -47,11 +50,10 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
       cache_check(Dstate);
       break;
 
+    case S_QUESTIONS_CHECK:
+      break;
+
     case S_RESOLVE:
-  //create pointer at beginning of q_name_str
-  //create pointer at end of q_name_str (put on the null char)
-  //end_ptr +1 then keep scanning until ptr+1 =  to the the next
-  //lo.edu.
       break;
       
     case S_STORE_IN_CACHE:
@@ -63,7 +65,7 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
     case S_SEND_RESP:
       break;
 
-    case S_CREATE_ANSWER:
+    case S_CREATE_RESP:
       break;
       
     case S_EXIT:
@@ -74,6 +76,30 @@ void process_dns(dns_state *Dstates[], conn *Conn, pkt *InitPkt) {
       fprintf(stderr, "!!Unknown STATE!!\n");
       break;
     }
+  }
+}
+
+void resolve(dns_state *Dstate) {
+  //need to check to how to handle cache hit & miss etc.
+  //is the current question resolved?
+  //if no
+  // ask question with current question label ptr
+  // generate a hash_key
+  //   increment the label ptr
+  //if the current question is resolved
+  // does it answer the initial query? 
+  // if yes
+  //  state = generate_response
+  // if no
+  //  state = 
+}
+
+void store_in_cache(dns_state *Dstate) {
+  rr_l *reply_temp = Dstate->reply_rr;
+
+  while(reply_temp != NULL) {
+    add_record(key_generate((char *)reply_temp->rr.name), reply_temp->rr);
+    reply_temp = reply_temp->next;
   }
 }
 
@@ -92,7 +118,7 @@ void cache_check(dns_state *Dstate) {
     if (Dstate->rd == RECURSE_YES)
       Dstate->state = S_QUESTIONS_CHECK;
   
-    Dstate->state = S_CREATE_ANSWER;
+    Dstate->state = S_CREATE_RESP;
   }
 
   Dstate->state = S_RESOLVE;
@@ -106,6 +132,7 @@ void print_name(name_t *name) {
     printf("%s.", name->label);
     name = name->next_label;
   }while(name != NULL);
+
   printf("\n");
 }
 

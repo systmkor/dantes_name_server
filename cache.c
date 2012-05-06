@@ -7,10 +7,13 @@
 
 extern ht_entry *cache;
 
+
 void add_record(hash_key cache_key, rr_t rr) {
-  ht_entry *cache_entry = find_entry(cache_key);
+  ht_entry *cache_entry;
   record_t *curr_record;
   record_t *new_record;
+  
+  cache_entry = find_entry(cache_key);
 
   if (cache_entry == NULL) {
     add_entry(cache_key);
@@ -48,7 +51,7 @@ void add_entry(hash_key cache_key) {
 
 ht_entry *find_entry(hash_key cache_key) {
   ht_entry *cache_entry;
-
+  /* return null and remove cache entry if ttl expires*/
   HASH_FIND_INT(cache, &cache_key, cache_entry);
   return cache_entry;
 }
@@ -112,4 +115,12 @@ a_rdata *a_rdata_alloc(void) {
   a_rdata *a = (a_rdata*)malloc(sizeof(a_rdata));
   bzero(a, sizeof(a_rdata));
   return a;
+}
+
+
+hash_key key_generate(char *name) {
+  static hash_key key;
+  bzero(key.name, DNS_NAME_MAX_LEN);
+  strncpy((char *)key.name, name, DNS_NAME_MAX_LEN);
+  return key;
 }
